@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/devfans/envconf.svg?branch=master)](https://travis-ci.org/devfans/envconf)
 [![Go Report Card](https://goreportcard.com/badge/github.com/devfans/envconf)](https://goreportcard.com/report/github.com/devfans/envconf)
+[![GoDoc](https://godoc.org/github.com/devfans/envconf?status.svg)](https://godoc.org/github.com/devfans/envconf)
 
 Boostrap for operations with config file or env variables.
 Read/Save config files like "~/.app" with sections and Set/Get env variables.
