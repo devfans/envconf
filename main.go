@@ -145,7 +145,10 @@ func (c *Config) parse() {
 	configDir, err := filepath.Abs(c.Path)
 	checkError(err)
 	f, err := os.Open(configDir)
-	checkError(err)
+  if err != nil {
+    log.Errorf("Failed to load config file %s, skipped it\n", configDir)
+    return
+  }
 	defer f.Close()
 	scanner := bufio.NewScanner(f)
 	var line, key, value string
