@@ -1,0 +1,5 @@
+language: go
+script: go test github.com/devfans/envconf/test
+branches:
+  only:
+  - master
