@@ -1,7 +1,7 @@
 package main
 
 import (
-	"envconf"
+	"github.com/devfans/envconf"
 	"testing"
 )
 
