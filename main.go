@@ -222,16 +222,3 @@ func NewConfig(path string) *Config {
 	return c
 }
 
-func main() {
-	c := NewConfig("~/.test1/test")
-	c.Put("test", 1)
-	c.Section = "server"
-	c.Put("address", "10.0.0.1")
-	c.Save()
-	cp := NewConfig("~/.test1/test")
-	log.Println(cp.Get("test"))
-	cp.Section = "server"
-	log.Println(cp.Get("address"))
-	cpp := cp.GetSection("main")
-	log.Println(cpp.Get("test"))
-}
