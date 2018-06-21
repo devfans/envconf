@@ -146,7 +146,7 @@ func (c *Config) parse() {
 	checkError(err)
 	f, err := os.Open(configDir)
   if err != nil {
-    log.Errorf("Failed to load config file %s, skipped it\n", configDir)
+    log.Printf("Failed to load config file %s, skipped it\n", configDir)
     return
   }
 	defer f.Close()
