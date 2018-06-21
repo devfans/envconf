@@ -30,8 +30,8 @@ func _getEnv(key string) string {
 }
 
 func _setEnv(key, value string) {
-  err := os.Setenv(key, value)
-  checkError(err)
+	err := os.Setenv(key, value)
+	checkError(err)
 }
 
 func _string(value interface{}) string {
@@ -64,32 +64,32 @@ func (c *Config) GetSection(section string) Section {
 
 // sugar for section object to get env
 func (sec *Section) Getenv(key interface{}) string {
-  return _getEnv(_string(key))
+	return _getEnv(_string(key))
 }
 
 // sugar for config object to get env
 func (c *Config) Getenv(key interface{}) string {
-  return _getEnv(_string(key))
+	return _getEnv(_string(key))
 }
 
 // sugar for section object to set env
 func (sec *Section) Setenv(key, value interface{}) {
-  _setEnv(_string(key), _string(value))
+	_setEnv(_string(key), _string(value))
 }
 
 // sugar for config object to set env
 func (c *Config) Setenv(key, value interface{}) {
-  _setEnv(_string(key), _string(value))
+	_setEnv(_string(key), _string(value))
 }
 
 // get key from config
 func (sec *Section) Getkey(key interface{}) string {
-  var configValue string
+	var configValue string
 	_configValue, ok := (*sec)[_string(key)]
 	if ok {
 		configValue = _string(_configValue)
 	}
-  return configValue
+	return configValue
 }
 
 // get key from config
