@@ -1,5 +1,5 @@
 language: go
-script: go test github.com/devfans/envconf/test
+script: go get github.com/devfans/envconf/test && go test github.com/devfans/envconf/test
 branches:
   only:
   - master
