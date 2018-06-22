@@ -162,7 +162,7 @@ func (c *Config) parse() {
 		line = scanner.Text()
 		matches := re.FindStringSubmatch(line)
 		if len(matches) > 1 {
-			sec = c.GetSection(matches[1])
+			sec = c.GetSection(strings.TrimSpace(matches[1]))
 			continue
 		}
 		args := strings.Split(line, "=")
