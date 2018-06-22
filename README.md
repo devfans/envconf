@@ -19,13 +19,14 @@ name = test
 [client]
 ```
 
+Usages:
 ```
 import "github.com/devfans/envconf"
 
 func main() {
   config := envconf.NewConfig("~/.app")
 
-  // get name from config
+  // get name key from config from default section: [main]
   name := config.Get("name")
 
   // get sections
@@ -38,6 +39,8 @@ func main() {
 
   // save to disk as file "~/.app"
   config.Save() 
+  
+  // other usages
   config.Section = "server"     // switch current section
   serverIp := config.Get("ip")  // localhost
 
@@ -46,15 +49,4 @@ func main() {
   config.Getenv("SERVER_IP")
   config.Setenv("SERVER_IP", "localhost")
 }
-```
-```
-~/.app:
-[main]
-name = my-app
-
-[server]
-ip = localhost
-
-[client]
-ip = 0.0.0.0
 ```
