@@ -9,6 +9,16 @@ Read/Save config files like "~/.app" with sections and Set/Get env variables.
 
 # Get Started
 
+Config file sample:
+```
+[main]
+name = test
+
+[server]
+
+[client]
+```
+
 ```
 import "github.com/devfans/envconf"
 
