@@ -166,12 +166,11 @@ func (c *Config) parse() {
 			continue
 		}
 		args := strings.Split(line, "=")
+    if len(args) < 2 {
+      continue
+    }
 		key = strings.TrimSpace(args[0])
-		if len(args) > 1 {
-			value = strings.TrimSpace(args[1])
-		} else {
-			value = ""
-		}
+	  value = strings.TrimSpace(args[1])
 		sec.Put(key, value)
 	}
 	err = scanner.Err()
