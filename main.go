@@ -163,6 +163,7 @@ func (c *Config) parse() {
 		matches := re.FindStringSubmatch(line)
 		if len(matches) > 1 {
 			sec = c.GetSection(matches[1])
+			continue
 		}
 		args := strings.Split(line, "=")
 		key = strings.TrimSpace(args[0])
