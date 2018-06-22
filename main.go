@@ -143,7 +143,11 @@ func (c *Config) Get(args ...interface{}) string {
 // parse config file
 func (c *Config) parse() {
 	configDir, err := filepath.Abs(c.Path)
-	checkError(err)
+  if err != nil {
+    log.Printf("Failed to locate config file %s, skipped it\n", c.Path)
+    return
+  }
+
 	f, err := os.Open(configDir)
   if err != nil {
     log.Printf("Failed to load config file %s, skipped it\n", configDir)
