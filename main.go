@@ -120,16 +120,18 @@ func (sec *Section) Get(args ...interface{}) string {
 
 	var configValue string
 	key := _string(args[0])
-	_configValue, ok := (*sec)[key]
-	if ok {
-		configValue = _string(_configValue)
-	}
 
-	if len(args) > 1 {
+  if len(args) > 1 {
 		envValue := _getEnv(key)
 		if envValue != "" {
 			return envValue
 		}
+    key = _string(args[1])
+	}
+
+	_configValue, ok := (*sec)[key]
+	if ok {
+		configValue = _string(_configValue)
 	}
 	return configValue
 }
