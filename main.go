@@ -171,7 +171,11 @@ func (c *Config) parse() {
   sec := c.GetSection("main")
   re := regexp.MustCompile(`\[(.+)\]`)
   for scanner.Scan() {
-    line = scanner.Text()
+    raw := scanner.Text()
+    // Split line to allow comments
+    tokens := strings.Split(raw, "//")
+    line = tokens[0]
+
     matches := re.FindStringSubmatch(line)
     if len(matches) > 1 {
       sec = c.GetSection(strings.TrimSpace(matches[1]))
