@@ -181,7 +181,7 @@ func (c *Config) parse() {
       sec = c.GetSection(strings.TrimSpace(matches[1]))
       continue
     }
-    args := strings.Split(line, "=")
+    args := strings.SplitN(line, "=", 2)
     if len(args) < 2 {
       continue
     }
