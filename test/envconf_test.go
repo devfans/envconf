@@ -13,6 +13,12 @@ func TestConf(t *testing.T) {
 	if address != "localhost" {
 		t.Errorf("Address does not match when getting from section")
 	}
+
+	address = server.GetConf("server_address", "0.0.0.0")
+	if address != "0.0.0.0" {
+		t.Errorf("Address does not match when getting from conf with default value")
+	}
+
 	config.Section = "server"
 	address = config.Get("address")
 
@@ -26,4 +32,13 @@ func TestConf(t *testing.T) {
 		t.Errorf("Name doest not match when use env as store")
 	}
 
+	address = config.GetEnv("server_address", "0.0.0.0")
+	if address != "0.0.0.0" {
+		t.Errorf("Address does not match when getting from env with default value")
+	}
+	config.Setenv("server_address", "10.0.0.0")
+	address = config.GetEnv("server_address", "0.0.0.0")
+	if address != "10.0.0.0" {
+		t.Errorf("Address does not match when getting from env with default value")
+	}
 }

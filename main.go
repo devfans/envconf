@@ -204,14 +204,60 @@ func (sec *Section) GetConf(args ...interface{}) string {
 //
 // At least the key name should be provided
 //
-// Parameter sets: key
+// Parameter sets: conf_key
 //
-// Parameter sets: env_key, key
+// Parameter sets: env_key, conf_key
 //
-// When env_key is provided it will try to fetch env variable first, if it's empty, it will try to get it from config
+// Parameter sets: env_key, conf_key, default_value
+//
+// When env_key is provided it will try to fetch env variable first,
+// if it's empty, it will try to get it from config
 func (c *Config) Get(args ...interface{}) string {
 	sec := c.GetSection(c.Section)
 	return sec.Get(args...)
+}
+
+// Get key values from config
+//
+// At least the key name should be provided
+//
+// Parameter sets: conf_key
+//
+// Parameter sets: conf_key, env_key
+//
+// Parameter sets: conf_key, env_key, default_value
+//
+// When env_key is provided it will try to fetch env variable only
+// if the value of conf_key is empty
+func (c *Config) Fetch(args ...interface{}) string {
+	sec := c.GetSection(c.Section)
+	return sec.Fetch(args...)
+}
+
+// Get key values from config
+//
+// At least the key name should be provided
+//
+// Parameter sets: conf_key
+//
+// Parameter sets: conf_key, default_value
+//
+func (c *Config) GetConf(args ...interface{}) string {
+	sec := c.GetSection(c.Section)
+	return sec.GetConf(args...)
+}
+
+// Get key values from env
+//
+// At least the key name should be provided
+//
+// Parameter sets: env_key
+//
+// Parameter sets: env_key, default_value
+//
+func (c *Config) GetEnv(args ...interface{}) string {
+	sec := c.GetSection(c.Section)
+	return sec.GetEnv(args...)
 }
 
 // Parse config file
