@@ -84,6 +84,16 @@ func (c *Config) Setenv(key, value interface{}) {
 	_setEnv(_string(key), _string(value))
 }
 
+// list keys section key without order
+func (sec *Section) List() []string {
+	if sec == nil { return nil }
+	keys := make([]string, 0, len(*sec))
+	for k := range *sec {
+		keys = append(keys, k)
+	}
+	return keys
+}
+
 // get key from config
 func (sec *Section) Getkey(key interface{}) string {
 	var configValue string
@@ -92,6 +102,12 @@ func (sec *Section) Getkey(key interface{}) string {
 		configValue = _string(_configValue)
 	}
 	return configValue
+}
+
+// List keys from current section
+func (c *Config) List() []string {
+	sec := c.GetSection(c.Section)
+	return sec.List()
 }
 
 // Get key from config
@@ -290,11 +306,18 @@ func (c *Config) parse() {
 			continue
 		}
 		args := strings.SplitN(line, "=", 2)
-		if len(args) < 2 {
+		if len(args) < 1 {
 			continue
 		}
 		key = strings.TrimSpace(args[0])
-		value = strings.TrimSpace(args[1])
+		if key == "" {
+			continue
+		}
+		if len(args) > 1 {
+			value = strings.TrimSpace(args[1])
+		} else {
+			value = ""
+		}
 		sec.Put(key, value)
 	}
 	err = scanner.Err()
