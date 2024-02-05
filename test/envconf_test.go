@@ -41,4 +41,11 @@ func TestConf(t *testing.T) {
 	if address != "10.0.0.0" {
 		t.Errorf("Address does not match when getting from env with default value")
 	}
+
+	valueStr := "\"https://xxfef\"//test"
+	value := envconf.ParseValue(valueStr)
+	if value != "https://xxfef" {
+		t.Errorf("Failed to parse value, parsed %s", value)
+	}
+	t.Log(value, envconf.ParseValue("323//3234"))
 }

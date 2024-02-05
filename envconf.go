@@ -276,6 +276,22 @@ func (c *Config) GetEnv(args ...interface{}) string {
 	return sec.GetEnv(args...)
 }
 
+func ParseValue(value string) string {
+	if strings.HasPrefix(value, "\"") {
+		tokens := strings.Split(value, "\"")
+		if len(tokens) > 1 {
+			return tokens[1]
+		}
+		return value[1:]
+	} else {
+		tokens := strings.SplitN(value, "//", 2)
+		if len(tokens) > 0 {
+			return strings.TrimSpace(tokens[0])
+		}
+	}
+	return ""
+}
+
 // Parse config file
 func (c *Config) parse() {
 	configDir, err := filepath.Abs(c.Path)
@@ -313,8 +329,9 @@ func (c *Config) parse() {
 		if key == "" {
 			continue
 		}
+		args = strings.SplitN(raw, "=", 2)
 		if len(args) > 1 {
-			value = strings.TrimSpace(args[1])
+			value = ParseValue(strings.TrimSpace(args[1]))
 		} else {
 			value = ""
 		}
