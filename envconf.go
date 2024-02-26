@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -48,13 +49,13 @@ func _get(array []interface{}, index int) interface{} {
 	}
 }
 
-// Create new section in config
+// NewSection will create new section in config
 func NewSection(section string) Section {
 	sec := make(Section)
 	return sec
 }
 
-// Get config section with name
+// GetSection gets config section with name
 func (c *Config) GetSection(section string) Section {
 	sec, ok := c.Sections[section]
 	if !ok {
@@ -64,27 +65,27 @@ func (c *Config) GetSection(section string) Section {
 	return sec
 }
 
-// Sugar for section object to get env
+// Getenv is a sugar for section object to get env
 func (sec *Section) Getenv(key interface{}) string {
 	return _getEnv(_string(key))
 }
 
-// Sugar for config object to get env
+// Getenv is a sugar for config object to get env
 func (c *Config) Getenv(key interface{}) string {
 	return _getEnv(_string(key))
 }
 
-// Sugar for section object to set env
+// Setenv is a sugar for section object to set env
 func (sec *Section) Setenv(key, value interface{}) {
 	_setEnv(_string(key), _string(value))
 }
 
-// Sugar for config object to set env
+// Setenv is a sugar for config object to set env
 func (c *Config) Setenv(key, value interface{}) {
 	_setEnv(_string(key), _string(value))
 }
 
-// list keys section key without order
+// List will list keys section key without order
 func (sec *Section) List() []string {
 	if sec == nil { return nil }
 	keys := make([]string, 0, len(*sec))
@@ -94,7 +95,7 @@ func (sec *Section) List() []string {
 	return keys
 }
 
-// get key from config
+// Getkey will get key from config
 func (sec *Section) Getkey(key interface{}) string {
 	var configValue string
 	_configValue, ok := (*sec)[_string(key)]
@@ -110,13 +111,13 @@ func (c *Config) List() []string {
 	return sec.List()
 }
 
-// Get key from config
+// Getkey will key from config
 func (c *Config) Getkey(key interface{}) string {
 	sec := c.GetSection(c.Section)
 	return sec.Getkey(key)
 }
 
-// Add new key with or without value
+// Put will add new key with or without value
 func (sec *Section) Put(args ...interface{}) {
 	if len(args) == 0 {
 		log.Fatalln("Please at least specify key name when adding a key!")
@@ -124,13 +125,13 @@ func (sec *Section) Put(args ...interface{}) {
 	(*sec)[_string(args[0])] = _get(args, 1)
 }
 
-// Wrapper for Put
+// Put is a Wrapper for Put
 func (c *Config) Put(args ...interface{}) {
 	sec := c.GetSection(c.Section)
 	sec.Put(args...)
 }
 
-// Get config key, args pattern: envKey, configKey, defaultValue or just configKey
+// Get will get config key, args pattern: envKey, configKey, defaultValue or just configKey
 func (sec *Section) Get(args ...interface{}) string {
 	if len(args) == 0 {
 		log.Fatalln("Please at least specify key name when getting a key value!")
@@ -158,7 +159,7 @@ func (sec *Section) Get(args ...interface{}) string {
 	return ""
 }
 
-// Get config key, args pattern: configKey, envKey, defaultValue
+// Fetch will get config key, args pattern: configKey, envKey, defaultValue
 func (sec *Section) Fetch(args ...interface{}) string {
 	if len(args) == 0 {
 		log.Fatalln("Please at least specify key name when getting a key value!")
@@ -182,7 +183,7 @@ func (sec *Section) Fetch(args ...interface{}) string {
 	return ""
 }
 
-// Get config key, args pattern: envKey, defaultValue
+// GetEnv will get config key, args pattern: envKey, defaultValue
 func (sec *Section) GetEnv(args ...interface{}) string {
 	if len(args) == 0 {
 		log.Fatalln("Please at least specify key name when getting a key value!")
@@ -199,7 +200,83 @@ func (sec *Section) GetEnv(args ...interface{}) string {
 	return ""
 }
 
-// Get config key, args pattern: confKey, defaultValue
+// String parse env value
+//
+// args set: (name)
+// args set: (name, defaultValue)
+func (sec *Section) String(args... interface{}) string {
+	return sec.GetEnv(args...)
+}
+
+// Int parse env value as int64
+//
+// args set: (name)
+// args set: (name, defaultValue)
+func (sec *Section) Int(args... interface{}) int64 {
+	s := sec.GetEnv(args...)
+	v, _ := strconv.ParseInt(s, 10, 64)
+	return v
+}
+
+// Uint64 parse env value as uint64
+//
+// args set: (name)
+// args set: (name, defaultValue)
+func (sec *Section) Uint(args... interface{}) uint64 {
+	s := sec.GetEnv(args...)
+	v, _ := strconv.ParseUint(s, 10, 64)
+	return v
+}
+
+// Bool parse env value as bool
+//
+// args set: (name)
+// args set: (name, defaultValue)
+func (sec *Section) Bool(args... interface{}) bool {
+	s := sec.GetEnv(args...)
+	v, _ := strconv.ParseBool(s)
+	return v
+}
+
+// String parse env value
+//
+// args set: (name)
+// args set: (name, defaultValue)
+func (c *Config) String(args... interface{}) string {
+	return c.GetEnv(args...)
+}
+
+// Int parse env value as int64
+//
+// args set: (name)
+// args set: (name, defaultValue)
+func (c *Config) Int(args... interface{}) int64 {
+	s := c.GetEnv(args...)
+	v, _ := strconv.ParseInt(s, 10, 64)
+	return v
+}
+
+// Uint parse env value as uint64
+//
+// args set: (name)
+// args set: (name, defaultValue)
+func (c *Config) Uint(args... interface{}) uint64 {
+	s := c.GetEnv(args...)
+	v, _ := strconv.ParseUint(s, 10, 64)
+	return v
+}
+
+// Bool parse env value as bool
+//
+// args set: (name)
+// args set: (name, defaultValue)
+func (c *Config) Bool(args... interface{}) bool {
+	s := c.GetEnv(args...)
+	v, _ := strconv.ParseBool(s)
+	return v
+}
+
+// GetConf will get config key, args pattern: confKey, defaultValue
 func (sec *Section) GetConf(args ...interface{}) string {
 	if len(args) == 0 {
 		log.Fatalln("Please at least specify key name when getting a key value!")
@@ -216,7 +293,7 @@ func (sec *Section) GetConf(args ...interface{}) string {
 	return ""
 }
 
-// Get key values from config
+// Get will get key values from config
 //
 // At least the key name should be provided
 //
@@ -233,7 +310,7 @@ func (c *Config) Get(args ...interface{}) string {
 	return sec.Get(args...)
 }
 
-// Get key values from config
+// Feth will get key values from config
 //
 // At least the key name should be provided
 //
@@ -250,7 +327,7 @@ func (c *Config) Fetch(args ...interface{}) string {
 	return sec.Fetch(args...)
 }
 
-// Get key values from config
+// GetConf will get key values from config
 //
 // At least the key name should be provided
 //
@@ -263,7 +340,7 @@ func (c *Config) GetConf(args ...interface{}) string {
 	return sec.GetConf(args...)
 }
 
-// Get key values from env
+// GetEnv will get key values from env
 //
 // At least the key name should be provided
 //
@@ -276,6 +353,7 @@ func (c *Config) GetEnv(args ...interface{}) string {
 	return sec.GetEnv(args...)
 }
 
+// ParseValue will parse config from raw string
 func ParseValue(value string) string {
 	if strings.HasPrefix(value, "\"") {
 		tokens := strings.Split(value, "\"")
@@ -341,7 +419,7 @@ func (c *Config) parse() {
 	checkError(err)
 }
 
-// Save config file and default keys locally
+// Save saves config file and default keys locally
 func (c *Config) Save() {
 	configDir, err := filepath.Abs(c.Path)
 	checkError(err)
@@ -383,7 +461,7 @@ func (c *Config) Save() {
 	log.Printf("Saved config file as %s", c.Path)
 }
 
-// Create main Config instance with specified config file path
+// NewConfig creates main Config instance with specified config file path
 func NewConfig(paths ...string) *Config {
 	c := &Config{}
 	c.Sections = make(map[string]Section)
@@ -393,5 +471,13 @@ func NewConfig(paths ...string) *Config {
 		c.Path = strings.Replace(path, "~", _getEnv("HOME"), 1)
 		c.parse()
 	}
+	return c
+}
+
+// NewEmptyConfig creates an empty Config instance
+func NewEmptyConfig() *Config {
+	c := &Config{}
+	c.Sections = make(map[string]Section)
+	c.Section = "main"
 	return c
 }
