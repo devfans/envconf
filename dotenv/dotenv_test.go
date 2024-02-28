@@ -16,6 +16,6 @@ func TestEnv(t *testing.T) {
 	t.Log(dotenv.Bool("d"))
 	t.Log(os.Getenv("test"))
 	t.Log(dotenv.String("test"))
-	t.Log(dotenv.Config.Get("a"))
-	t.Log(dotenv.Config.Get("b"))
+	t.Log(dotenv.EnvConf().Get("a"))
+	t.Log(dotenv.EnvConf().Get("b"))
 }
