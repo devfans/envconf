@@ -66,7 +66,7 @@ func (c *Config) GetSection(section string) Section {
 }
 
 // Getenv is a sugar for section object to get env
-func (sec *Section) Getenv(key interface{}) string {
+func (sec Section) Getenv(key interface{}) string {
 	return _getEnv(_string(key))
 }
 
@@ -76,7 +76,7 @@ func (c *Config) Getenv(key interface{}) string {
 }
 
 // Setenv is a sugar for section object to set env
-func (sec *Section) Setenv(key, value interface{}) {
+func (sec Section) Setenv(key, value interface{}) {
 	_setEnv(_string(key), _string(value))
 }
 
@@ -86,19 +86,19 @@ func (c *Config) Setenv(key, value interface{}) {
 }
 
 // List will list keys section key without order
-func (sec *Section) List() []string {
+func (sec Section) List() []string {
 	if sec == nil { return nil }
-	keys := make([]string, 0, len(*sec))
-	for k := range *sec {
+	keys := make([]string, 0, len(sec))
+	for k := range sec {
 		keys = append(keys, k)
 	}
 	return keys
 }
 
 // Getkey will get key from config
-func (sec *Section) Getkey(key interface{}) string {
+func (sec Section) Getkey(key interface{}) string {
 	var configValue string
-	_configValue, ok := (*sec)[_string(key)]
+	_configValue, ok := sec[_string(key)]
 	if ok {
 		configValue = _string(_configValue)
 	}
@@ -118,11 +118,11 @@ func (c *Config) Getkey(key interface{}) string {
 }
 
 // Put will add new key with or without value
-func (sec *Section) Put(args ...interface{}) {
+func (sec Section) Put(args ...interface{}) {
 	if len(args) == 0 {
 		log.Fatalln("Please at least specify key name when adding a key!")
 	}
-	(*sec)[_string(args[0])] = _get(args, 1)
+	sec[_string(args[0])] = _get(args, 1)
 }
 
 // Put is a Wrapper for Put
@@ -132,7 +132,7 @@ func (c *Config) Put(args ...interface{}) {
 }
 
 // Get will get config key, args pattern: envKey, configKey, defaultValue or just configKey
-func (sec *Section) Get(args ...interface{}) string {
+func (sec Section) Get(args ...interface{}) string {
 	if len(args) == 0 {
 		log.Fatalln("Please at least specify key name when getting a key value!")
 	}
@@ -147,7 +147,7 @@ func (sec *Section) Get(args ...interface{}) string {
 	}
 
 	if len(args) > 1 {
-		configValue, ok := (*sec)[_string(args[1])]
+		configValue, ok := sec[_string(args[1])]
 		if ok {
 			return _string(configValue)
 		}
@@ -160,12 +160,12 @@ func (sec *Section) Get(args ...interface{}) string {
 }
 
 // Fetch will get config key, args pattern: configKey, envKey, defaultValue
-func (sec *Section) Fetch(args ...interface{}) string {
+func (sec Section) Fetch(args ...interface{}) string {
 	if len(args) == 0 {
 		log.Fatalln("Please at least specify key name when getting a key value!")
 	}
 
-	configValue, ok := (*sec)[_string(args[0])]
+	configValue, ok := sec[_string(args[0])]
 	if ok {
 		return _string(configValue)
 	}
@@ -184,7 +184,7 @@ func (sec *Section) Fetch(args ...interface{}) string {
 }
 
 // GetEnv will get config key, args pattern: envKey, defaultValue
-func (sec *Section) GetEnv(args ...interface{}) string {
+func (sec Section) GetEnv(args ...interface{}) string {
 	if len(args) == 0 {
 		log.Fatalln("Please at least specify key name when getting a key value!")
 	}
@@ -204,7 +204,7 @@ func (sec *Section) GetEnv(args ...interface{}) string {
 //
 // args set: (name)
 // args set: (name, defaultValue)
-func (sec *Section) String(args... interface{}) string {
+func (sec Section) String(args... interface{}) string {
 	return sec.GetEnv(args...)
 }
 
@@ -212,7 +212,7 @@ func (sec *Section) String(args... interface{}) string {
 //
 // args set: (name)
 // args set: (name, defaultValue)
-func (sec *Section) Int(args... interface{}) int64 {
+func (sec Section) Int(args... interface{}) int64 {
 	s := sec.GetEnv(args...)
 	v, _ := strconv.ParseInt(s, 10, 64)
 	return v
@@ -222,7 +222,7 @@ func (sec *Section) Int(args... interface{}) int64 {
 //
 // args set: (name)
 // args set: (name, defaultValue)
-func (sec *Section) Uint(args... interface{}) uint64 {
+func (sec Section) Uint(args... interface{}) uint64 {
 	s := sec.GetEnv(args...)
 	v, _ := strconv.ParseUint(s, 10, 64)
 	return v
@@ -232,7 +232,7 @@ func (sec *Section) Uint(args... interface{}) uint64 {
 //
 // args set: (name)
 // args set: (name, defaultValue)
-func (sec *Section) Bool(args... interface{}) bool {
+func (sec Section) Bool(args... interface{}) bool {
 	s := sec.GetEnv(args...)
 	v, _ := strconv.ParseBool(s)
 	return v
@@ -277,12 +277,12 @@ func (c *Config) Bool(args... interface{}) bool {
 }
 
 // GetConf will get config key, args pattern: confKey, defaultValue
-func (sec *Section) GetConf(args ...interface{}) string {
+func (sec Section) GetConf(args ...interface{}) string {
 	if len(args) == 0 {
 		log.Fatalln("Please at least specify key name when getting a key value!")
 	}
 
-	configValue, ok := (*sec)[_string(args[0])]
+	configValue, ok := sec[_string(args[0])]
 	if ok {
 		return _string(configValue)
 	}
