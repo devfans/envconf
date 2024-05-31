@@ -20,7 +20,7 @@ func init() {
 	}
 	config = envconf.NewConfig(envFile)
 	for _, key := range config.List() {
-		os.Setenv(key, config.GetConf(key))
+		os.Setenv(key, config.GetConf(key).String())
 	}
 }
 
@@ -35,7 +35,7 @@ func EnvConf() *envconf.Config {
 // args set: (name, defaultValue)
 //
 func String(args... interface{}) string {
-	return config.String(args...)
+	return config.GetEnv(args...).String()
 }
 
 // Int parse env value as int64
@@ -43,7 +43,7 @@ func String(args... interface{}) string {
 // args set: (name)
 // args set: (name, defaultValue)
 func Int(args... interface{}) int64 {
-	return config.Int(args...)
+	return config.GetEnv(args...).Int()
 }
 
 // Uint parse env value as uint64
@@ -51,7 +51,7 @@ func Int(args... interface{}) int64 {
 // args set: (name)
 // args set: (name, defaultValue)
 func Uint(args... interface{}) uint64 {
-	return config.Uint(args...)
+	return config.GetEnv(args...).Uint()
 }
 
 // Bool parse env value as bool
@@ -59,5 +59,5 @@ func Uint(args... interface{}) uint64 {
 // args set: (name)
 // args set: (name, defaultValue)
 func Bool(args... interface{}) bool {
-	return config.Bool(args...)
+	return config.GetEnv(args...).Bool()
 }

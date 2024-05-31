@@ -9,16 +9,44 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
-// Section is a based on map
+// Value define the general value type
+type Value string
+
+// Int converts Value to int64
+func (v Value) Int() int64 {
+	value, _ := strconv.ParseInt(string(v), 10, 64)
+	return value
+}
+
+// Int converts Value to uint64
+func (v Value) Uint() uint64 {
+	value, _ := strconv.ParseUint(string(v), 10, 64)
+	return value
+}
+
+// Int converts Value to bool
+func (v Value) Bool() bool {
+	value, _ := strconv.ParseBool(string(v))
+	return value
+}
+
+// Int converts Value to string
+func (v Value) String() string {
+	return string(v)
+}
+
+// Section is a based on map, not thread safe
 type Section map[string]interface{}
 
 // Config struct has map to contains secions and an attribute to indicate the current section
 type Config struct {
 	Path     string
 	Sections map[string]Section
+	sync.Mutex
 	Section  string
 }
 
@@ -57,11 +85,13 @@ func NewSection(section string) Section {
 
 // GetSection gets config section with name
 func (c *Config) GetSection(section string) Section {
+	c.Lock()
 	sec, ok := c.Sections[section]
 	if !ok {
 		sec = NewSection(section)
 		c.Sections[section] = sec
 	}
+	c.Unlock()
 	return sec
 }
 
@@ -132,7 +162,7 @@ func (c *Config) Put(args ...interface{}) {
 }
 
 // Get will get config key, args pattern: envKey, configKey, defaultValue or just configKey
-func (sec Section) Get(args ...interface{}) string {
+func (sec Section) Get(args ...interface{}) Value {
 	if len(args) == 0 {
 		log.Fatalln("Please at least specify key name when getting a key value!")
 	}
@@ -143,117 +173,108 @@ func (sec Section) Get(args ...interface{}) string {
 
 	envValue := _getEnv(_string(args[0]))
 	if envValue != "" {
-		return envValue
+		return Value(envValue)
 	}
 
 	if len(args) > 1 {
 		configValue, ok := sec[_string(args[1])]
 		if ok {
-			return _string(configValue)
+			return Value(_string(configValue))
 		}
 	}
 
 	if len(args) > 2 {
-		return _string(args[2])
+		return Value(_string(args[2]))
 	}
 	return ""
 }
 
 // Fetch will get config key, args pattern: configKey, envKey, defaultValue
-func (sec Section) Fetch(args ...interface{}) string {
+func (sec Section) Fetch(args ...interface{}) Value {
 	if len(args) == 0 {
 		log.Fatalln("Please at least specify key name when getting a key value!")
 	}
 
 	configValue, ok := sec[_string(args[0])]
 	if ok {
-		return _string(configValue)
+		return Value(_string(configValue))
 	}
 
 	if len(args) > 1 {
 		envValue := _getEnv(_string(args[1]))
 		if envValue != "" {
-			return envValue
+			return Value(envValue)
 		}
 	}
 
 	if len(args) > 2 {
-		return _string(args[2])
+		return Value(_string(args[2]))
 	}
 	return ""
 }
 
 // GetEnv will get config key, args pattern: envKey, defaultValue
-func (sec Section) GetEnv(args ...interface{}) string {
+func (sec Section) GetEnv(args ...interface{}) Value {
 	if len(args) == 0 {
 		log.Fatalln("Please at least specify key name when getting a key value!")
 	}
 
 	envValue := _getEnv(_string(args[0]))
 	if envValue != "" {
-		return envValue
+		return Value(envValue)
 	}
 
 	if len(args) > 1 {
-		return _string(args[1])
+		return Value(_string(args[1]))
 	}
 	return ""
 }
 
-// String parse env value
+// String parse config value
 //
 // args set: (name)
 // args set: (name, defaultValue)
 func (sec Section) String(args... interface{}) string {
-	return sec.GetEnv(args...)
+	return sec.GetConf(args...).String()
 }
 
-// Int parse env value as int64
+// Int parse config value as int64
 //
 // args set: (name)
 // args set: (name, defaultValue)
 func (sec Section) Int(args... interface{}) int64 {
-	s := sec.GetEnv(args...)
-	v, _ := strconv.ParseInt(s, 10, 64)
-	return v
+	return sec.GetConf(args...).Int()
 }
 
-// Uint64 parse env value as uint64
+// Uint64 parse config value as uint64
 //
 // args set: (name)
 // args set: (name, defaultValue)
 func (sec Section) Uint(args... interface{}) uint64 {
-	s := sec.GetEnv(args...)
-	v, _ := strconv.ParseUint(s, 10, 64)
-	return v
+	return sec.GetConf(args...).Uint()
 }
 
-// Bool parse env value as bool
+// Bool parse config value as bool
 //
 // args set: (name)
 // args set: (name, defaultValue)
 func (sec Section) Bool(args... interface{}) bool {
-	s := sec.GetEnv(args...)
-	v, _ := strconv.ParseBool(s)
-	return v
+	return sec.GetConf(args...).Bool()
 }
 
-// String parse env value
+// String parse config value as string
 //
 // args set: (name)
 // args set: (name, defaultValue)
 func (c *Config) String(args... interface{}) string {
-	return c.GetEnv(args...)
-}
+	return c.GetSection(c.Section).String()}
 
 // Int parse env value as int64
 //
 // args set: (name)
 // args set: (name, defaultValue)
 func (c *Config) Int(args... interface{}) int64 {
-	s := c.GetEnv(args...)
-	v, _ := strconv.ParseInt(s, 10, 64)
-	return v
+	return c.GetSection(c.Section).Int()
 }
 
 // Uint parse env value as uint64
@@ -261,9 +282,7 @@ func (c *Config) Int(args... interface{}) int64 {
 // args set: (name)
 // args set: (name, defaultValue)
 func (c *Config) Uint(args... interface{}) uint64 {
-	s := c.GetEnv(args...)
-	v, _ := strconv.ParseUint(s, 10, 64)
-	return v
+	return c.GetSection(c.Section).Uint()
 }
 
 // Bool parse env value as bool
@@ -271,24 +290,22 @@ func (c *Config) Uint(args... interface{}) uint64 {
 // args set: (name)
 // args set: (name, defaultValue)
 func (c *Config) Bool(args... interface{}) bool {
-	s := c.GetEnv(args...)
-	v, _ := strconv.ParseBool(s)
-	return v
+	return c.GetSection(c.Section).Bool()
 }
 
 // GetConf will get config key, args pattern: confKey, defaultValue
-func (sec Section) GetConf(args ...interface{}) string {
+func (sec Section) GetConf(args ...interface{}) Value {
 	if len(args) == 0 {
 		log.Fatalln("Please at least specify key name when getting a key value!")
 	}
 
 	configValue, ok := sec[_string(args[0])]
 	if ok {
-		return _string(configValue)
+		return Value(_string(configValue))
 	}
 
 	if len(args) > 1 {
-		return _string(args[1])
+		return Value(_string(args[1]))
 	}
 	return ""
 }
@@ -305,7 +322,7 @@ func (sec Section) GetConf(args ...interface{}) string {
 //
 // When env_key is provided it will try to fetch env variable first,
 // if it's empty, it will try to get it from config
-func (c *Config) Get(args ...interface{}) string {
+func (c *Config) Get(args ...interface{}) Value {
 	sec := c.GetSection(c.Section)
 	return sec.Get(args...)
 }
@@ -322,7 +339,7 @@ func (c *Config) Get(args ...interface{}) string {
 //
 // When env_key is provided it will try to fetch env variable only
 // if the value of conf_key is empty
-func (c *Config) Fetch(args ...interface{}) string {
+func (c *Config) Fetch(args ...interface{}) Value {
 	sec := c.GetSection(c.Section)
 	return sec.Fetch(args...)
 }
@@ -335,7 +352,7 @@ func (c *Config) Fetch(args ...interface{}) string {
 //
 // Parameter sets: conf_key, default_value
 //
-func (c *Config) GetConf(args ...interface{}) string {
+func (c *Config) GetConf(args ...interface{}) Value {
 	sec := c.GetSection(c.Section)
 	return sec.GetConf(args...)
 }
@@ -348,7 +365,7 @@ func (c *Config) GetConf(args ...interface{}) string {
 //
 // Parameter sets: env_key, default_value
 //
-func (c *Config) GetEnv(args ...interface{}) string {
+func (c *Config) GetEnv(args ...interface{}) Value {
 	sec := c.GetSection(c.Section)
 	return sec.GetEnv(args...)
 }
@@ -444,6 +461,8 @@ func (c *Config) Save() {
 
 	firstLine := true
 	_secTemplate := "[%v]\n"
+	c.Lock()
+	defer c.Unlock()
 	for section, config := range c.Sections {
 		secTemplate := _secTemplate
 		if !firstLine {
