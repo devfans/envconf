@@ -19,7 +19,11 @@ func init() {
 		return
 	}
 	config = envconf.NewConfig(envFile)
-	for _, key := range config.List() {
+	list := config.List()
+	if sec := config.String("use_section"); sec != "" {
+		list = config.GetSection(sec).List()
+	}
+	for _, key := range list {
 		os.Setenv(key, config.GetConf(key).String())
 	}
 }
@@ -52,6 +56,14 @@ func Int(args... interface{}) int64 {
 // args set: (name, defaultValue)
 func Uint(args... interface{}) uint64 {
 	return config.GetEnv(args...).Uint()
+}
+
+// Float parse env value as float64
+//
+// args set: (name)
+// args set: (name, defaultValue)
+func Float(args... interface{}) float64 {
+	return config.GetEnv(args...).Float()
 }
 
 // Bool parse env value as bool

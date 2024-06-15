@@ -39,6 +39,13 @@ func (v Value) String() string {
 	return string(v)
 }
 
+// Float converts Value to float64
+func (v Value) Float() float64 {
+	value, _ := strconv.ParseFloat(string(v), 64)
+	return value
+}
+
+
 // Section is a based on map, not thread safe
 type Section map[string]interface{}
 
@@ -246,7 +253,7 @@ func (sec Section) Int(args... interface{}) int64 {
 	return sec.GetConf(args...).Int()
 }
 
-// Uint64 parse config value as uint64
+// Uint parse config value as uint64
 //
 // args set: (name)
 // args set: (name, defaultValue)
@@ -262,19 +269,27 @@ func (sec Section) Bool(args... interface{}) bool {
 	return sec.GetConf(args...).Bool()
 }
 
+// Float parse config value as float64
+//
+// args set: (name)
+// args set: (name, defaultValue)
+func (sec Section) Float(args... interface{}) float64 {
+	return sec.GetConf(args...).Float()
+}
+
 // String parse config value as string
 //
 // args set: (name)
 // args set: (name, defaultValue)
 func (c *Config) String(args... interface{}) string {
-	return c.GetSection(c.Section).String()}
+	return c.GetSection(c.Section).String(args...)}
 
 // Int parse env value as int64
 //
 // args set: (name)
 // args set: (name, defaultValue)
 func (c *Config) Int(args... interface{}) int64 {
-	return c.GetSection(c.Section).Int()
+	return c.GetSection(c.Section).Int(args...)
 }
 
 // Uint parse env value as uint64
@@ -282,7 +297,15 @@ func (c *Config) Int(args... interface{}) int64 {
 // args set: (name)
 // args set: (name, defaultValue)
 func (c *Config) Uint(args... interface{}) uint64 {
-	return c.GetSection(c.Section).Uint()
+	return c.GetSection(c.Section).Uint(args...)
+}
+
+// Float parse env value as float64
+//
+// args set: (name)
+// args set: (name, defaultValue)
+func (c *Config) Float(args... interface{}) float64 {
+	return c.GetSection(c.Section).Float(args...)
 }
 
 // Bool parse env value as bool
@@ -290,7 +313,7 @@ func (c *Config) Uint(args... interface{}) uint64 {
 // args set: (name)
 // args set: (name, defaultValue)
 func (c *Config) Bool(args... interface{}) bool {
-	return c.GetSection(c.Section).Bool()
+	return c.GetSection(c.Section).Bool(args...)
 }
 
 // GetConf will get config key, args pattern: confKey, defaultValue

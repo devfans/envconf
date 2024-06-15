@@ -42,11 +42,53 @@ func main() {
   
   // other usages
   config.Section = "server"     // switch current section
-  serverIp := config.Get("ip")  // localhost
+  serverIp := config.String("ip")  // localhost
 
   config.Get("SERVER_IP", "ip") // get env first if env variable is not null
 
   config.Getenv("SERVER_IP")
   config.Setenv("SERVER_IP", "localhost")
 }
+```
+
+## dotenv
+
+```
+# file: .env
+
+[main]
+use_section = case1
+
+[case1]
+name = a
+
+[case2]
+name = b
+
+```
+
+Example
+
+```
+
+import (
+	"os"
+	"testing"
+
+	"github.com/devfans/envconf/dotenv"
+)
+
+func TestEnv(t *testing.T) {
+	t.Log(os.Getenv("a"))
+	t.Log(os.Getenv("b"))
+	t.Log(dotenv.Int("a"))
+	t.Log(dotenv.Uint("b"))
+	t.Log(dotenv.Bool("c"))
+	t.Log(dotenv.Bool("d"))
+	t.Log(os.Getenv("test"))
+	t.Log(dotenv.String("test"))
+	t.Log(dotenv.EnvConf().Get("a"))
+	t.Log(dotenv.EnvConf().Get("b"))
+}
+
 ```
