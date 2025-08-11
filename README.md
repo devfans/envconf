@@ -12,7 +12,7 @@ Read/Save config files like "~/.app" with sections and Set/Get env variables.
 Config file sample:
 ```
 [main]
-name = test
+name = test # comment
 
 [server]
 

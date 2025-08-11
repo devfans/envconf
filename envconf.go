@@ -402,7 +402,7 @@ func ParseValue(value string) string {
 		}
 		return value[1:]
 	} else {
-		tokens := strings.SplitN(value, "//", 2)
+		tokens := strings.SplitN(value, "#", 2)
 		if len(tokens) > 0 {
 			return strings.TrimSpace(tokens[0])
 		}
@@ -431,7 +431,7 @@ func (c *Config) parse() {
 	for scanner.Scan() {
 		raw := scanner.Text()
 		// Split line to allow comments
-		tokens := strings.Split(raw, "//")
+		tokens := strings.Split(raw, "#")
 		line = tokens[0]
 
 		matches := re.FindStringSubmatch(line)
